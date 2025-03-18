@@ -1,0 +1,56 @@
+import java.util.Scanner;
+
+public class pessoa{
+    public static void main(String args[]){
+        String name;
+        float weight, height, imc;
+        int age;
+        name = nome();
+        age = idade();
+        weight = peso();
+        height = altura();
+        imc = IMC(weight, height);
+
+        System.out.println("Nome: "+name);
+        System.out.println("Idade: "+age);
+        System.out.println("Peso: "+weight);
+        System.out.println("Altura: "+height);
+        System.out.printf("IMC: %.3f", imc);
+
+    }
+    public static String nome(){
+        System.out.println("Digite o seu nome:");
+        Scanner teclado = new Scanner(System.in);
+        String s = teclado.nextLine();
+
+        return s;
+    }
+    public static int idade(){
+        System.out.println("Digite sua idade:");
+        Scanner teclado = new Scanner(System.in);
+        String s = teclado.nextLine();
+        int idade1 = Integer.parseInt(s);
+
+        return idade1;
+    }
+    public static float peso(){
+        System.out.println("Digite o seu peso:");
+        Scanner teclado = new Scanner(System.in);
+        String s = teclado.nextLine();
+        float peso1 = Float.parseFloat(s);
+
+        return peso1;
+    }
+    public static float altura(){
+        System.out.println("Digite a sua altura:");
+        Scanner teclado = new Scanner(System.in);
+        String s = teclado.nextLine();
+        float altura1 = Float.parseFloat(s);
+
+        return altura1;
+    }
+    public static float IMC(float Peso, float Altura){
+        float var = (Peso/(Altura*Altura));
+        return var;
+    }
+}

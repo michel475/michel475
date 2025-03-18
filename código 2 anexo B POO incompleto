@@ -1,0 +1,34 @@
+import java.util.Scanner;
+
+public class volumecalculo{
+
+    public static void main(String args[]){
+        ModelaPiramide piramide = new ModelaPiramide();
+        float Base, Altura;
+        System.out.println("Digite a base: ");
+        Scanner teclado = new Scanner(System.in);
+        String s = teclado.nextLine();
+        Base = Float.parseFloat(s);
+        System.out.println("Digite a altura: ");
+        teclado = new Scanner(System.in);
+        s = teclado.nextLine();
+        Altura = Float.parseFloat(s);
+        System.out.println(piramide.volume());
+    }
+}
+
+class ModelaPiramide{
+    private float base, altura;
+
+    
+
+    public void armazena(float Base, float Altura){
+        this.base = Base;
+        this.altura = Altura;
+    }
+    public float volume(){
+        float vol = (base*altura);
+
+        return vol;
+    }
+}

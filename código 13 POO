@@ -1,0 +1,47 @@
+import java.util.Scanner;
+
+public class verifhelp{
+    public static void main(String args[]){
+        System.out.println("Digite uma frase");
+        Scanner teclado = new Scanner(System.in);
+        String s = teclado.nextLine();
+        char c, j, i, o, p, flag=0;
+        int k, m=s.length();
+        for(k=0; k<m; k++)
+        {
+            c = s.charAt(k);
+            if(c == '-')
+            {
+                j = s.charAt(k+1);
+                if(j == 'h')
+                {
+                    i = s.charAt(k+2);
+                    if(i == 'e')
+                    {
+                        o = s.charAt(k+3);
+                        if(o == 'l')
+                        {
+                            p = s.charAt(k+4);
+                            if(p == 'p')
+                            {
+                                flag = 1;
+                            }
+                        }
+                    }
+                    else{
+                        flag = 1;
+                    }
+                }
+            }
+        }
+        if(flag == 1)
+        {
+            System.out.println("Sim");
+        }
+        else
+            if(flag == 0)
+            {
+                System.out.println("Nao");
+            }
+    }
+}

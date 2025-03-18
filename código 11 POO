@@ -1,0 +1,22 @@
+import java.util.Scanner;
+
+public class booleano{
+    public static void main(String args[]){
+        int lim=10;
+        boolean v[];
+        v = new boolean[lim];
+        Scanner teclado;
+        int i, cont=0;
+        System.out.println("Digite 10 valores booleanos: ");
+        for(i=0; i<lim; i++)
+        {
+            teclado = new Scanner(System.in);
+            v[i] = teclado.nextBoolean();
+            if(v[i]==true)
+            {
+                cont++;
+            }
+        }
+        System.out.println("Elementos iguais a true: "+cont);
+    }
+}

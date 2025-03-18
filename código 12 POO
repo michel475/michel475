@@ -1,0 +1,22 @@
+import java.util.Scanner;
+
+public class vetordestring{
+    public static void main(String args[]){
+        int lim=10;
+        String v[];
+        v = new String[lim];
+        Scanner teclado;
+        int i, cont=0, tam;
+        System.out.println("Digite 10 strings:");
+        for(i=0; i<lim; i++)
+        {
+            teclado = new Scanner(System.in);
+            v[i] = teclado.nextLine();
+            tam = v[i].length();
+            if(tam<10){
+                cont++;
+            }
+        }
+        System.out.println("Total de strings que tem menos de 10 caracteres: "+cont);
+    }
+}

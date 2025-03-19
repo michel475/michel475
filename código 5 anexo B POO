@@ -1,0 +1,50 @@
+import java.util.Scanner;
+
+public class modelagemparalelepipedo{
+    public static void main(String args[]){
+        Paralelepipedo paralelepipedo = new Paralelepipedo();
+        float Altura, Largura, Comprimento;
+        Scanner teclado;
+        String s;
+        System.out.println("Informe a altura: ");
+        teclado = new Scanner(System.in);
+        s = teclado.nextLine();
+        Altura = Float.parseFloat(s);
+        System.out.println("Informe a largura: ");
+        teclado = new Scanner(System.in);
+        s = teclado.nextLine();
+        Largura = Float.parseFloat(s);
+        System.out.println("Informe o comprimento: ");
+        teclado = new Scanner(System.in);
+        s = teclado.nextLine();
+        Comprimento = Float.parseFloat(s);
+        paralelepipedo.armazenamento(Altura, Largura, Comprimento);
+        System.out.println("Area: ");
+        System.out.printf("%.2f", paralelepipedo.Area());
+        System.out.printf("\n");
+        System.out.println("Volume: ");
+        System.out.printf("%.2f", paralelepipedo.Volume());
+    }
+}
+
+class Paralelepipedo{
+    private float altura, largura, comprimento;
+
+    public void armazenamento(float Altura, float Largura, float Comprimento){
+        this.altura = Altura;
+        this.largura = Largura;
+        this.comprimento = Comprimento;
+    }
+
+    public float Area(){
+        float area = 2*(altura*largura + altura*comprimento + largura*comprimento);
+
+        return area;
+    }
+
+    public float Volume(){
+        float volume = altura*largura*comprimento;
+
+        return volume;
+    }
+}

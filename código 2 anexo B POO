@@ -13,6 +13,7 @@ public class volumecalculo{
         teclado = new Scanner(System.in);
         s = teclado.nextLine();
         Altura = Float.parseFloat(s);
+        piramide.armazena(Base, Altura);
         System.out.println(piramide.volume());
     }
 }
@@ -27,7 +28,7 @@ class ModelaPiramide{
         this.altura = Altura;
     }
     public float volume(){
-        float vol = (base*altura);
+        float vol = (base*altura)/3;
 
         return vol;
     }

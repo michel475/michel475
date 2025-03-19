@@ -1,0 +1,68 @@
+import java.util.Scanner;
+
+public class modelagemcilindro{
+    public static void main(String args[]){
+        Cilindro cilindro = new Cilindro();
+        float Raio, Altura;
+        Scanner teclado;
+        String s;
+        System.out.println("Informe o raio: ");
+        teclado = new Scanner(System.in);
+        s = teclado.nextLine();
+        Raio = Float.parseFloat(s);
+        if(Raio<0){
+            while(Raio<0){
+                System.out.println("Informe um valor positivo: ");
+                teclado = new Scanner(System.in);
+                s = teclado.nextLine();
+                Raio = Float.parseFloat(s);
+            }
+        }
+        System.out.println("Informe a altura: ");
+        teclado = new Scanner(System.in);
+        s = teclado.nextLine();
+        Altura = Float.parseFloat(s);
+        if(Altura<0){
+            while(Altura<0){
+                System.out.println("Informe um valor positivo: ");
+                teclado = new Scanner(System.in);
+                s = teclado.nextLine();
+                Altura = Float.parseFloat(s);
+            }
+        }
+        cilindro.armazenamento(Raio, Altura);
+        System.out.println("Area lateral: ");
+        System.out.printf("%.2f\n", cilindro.AreaLateral());
+        System.out.println("Area total: ");
+        System.out.printf("%.2f\n", cilindro.AreaTotal());
+        System.out.println("volume: ");
+        System.out.printf("%.2f\n", cilindro.Volume());
+    }
+}
+
+class Cilindro{
+    private float raio, altura;
+
+    public void armazenamento(float Raio, float Altura){
+        this.raio = Raio;
+        this.altura = Altura;
+    }
+
+    public double AreaLateral(){
+        double arealateral = 2*3.1415*(raio*altura);
+
+        return arealateral;
+    }
+
+    public double AreaTotal(){
+        double areatotal = 2*3.1415*raio*(altura+raio);
+
+        return areatotal;
+    }
+
+    public double Volume(){
+        double volume = 3.1415*raio*raio*altura;
+
+        return volume;
+    }
+}

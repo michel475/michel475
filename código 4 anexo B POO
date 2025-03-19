@@ -1,0 +1,61 @@
+import java.util.Scanner;
+
+public class modelagemretangulo{
+
+    public static void main(String args[]){
+        Retangulo retangulo = new Retangulo();
+        float Comprimento, Largura;
+        System.out.println("Digite a comprimento: ");
+        Scanner teclado = new Scanner(System.in);
+        String s = teclado.nextLine();
+        Comprimento = Float.parseFloat(s);
+        if(Comprimento<0){
+            while(Comprimento<0){
+                System.out.println("Digite um valor positivo: ");
+                teclado = new Scanner(System.in);
+                s = teclado.nextLine();
+                Comprimento = Float.parseFloat(s);
+            }
+        }
+        System.out.println("Digite a largura: ");
+        teclado = new Scanner(System.in);
+        s = teclado.nextLine();
+        Largura = Float.parseFloat(s);
+        if(Largura<0){
+            while(Largura<0){
+                System.out.println("Digite um valor positivo: ");
+                teclado = new Scanner(System.in);
+                s = teclado.nextLine();
+                Largura = Float.parseFloat(s);
+            }
+        }
+        retangulo.armazena(Comprimento, Largura);
+        System.out.println("Area do retangulo: ");
+        System.out.println(retangulo.Area());
+        System.out.println("Perimetro do retangulo: ");
+        System.out.println(retangulo.Perimetro());
+    }
+}
+
+class Retangulo{
+    private float comprimento, largura;
+
+    
+
+    public void armazena(float Comprimento, float Largura){
+        this.comprimento = Comprimento;
+        this.largura = Largura;
+    }
+
+    public float Area(){
+        float area = comprimento*largura;
+
+        return area;
+    }
+
+    public float Perimetro(){
+        float perimetro = 2*(comprimento+largura);
+
+        return perimetro;
+    }
+}

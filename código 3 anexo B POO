@@ -1,0 +1,46 @@
+import java.util.Scanner;
+
+public class modelagemesfera{
+    public static void main(String args[]){
+        Esfera esfera = new Esfera();
+        float raio;
+        System.out.println("Digite o raio da esfera: ");
+        Scanner teclado = new Scanner(System.in);
+        String s = teclado.nextLine();
+        raio = Float.parseFloat(s);
+        if(raio<0){
+            while(raio<0){
+                System.out.println("Digite um valor positivo: ");
+                teclado = new Scanner(System.in);
+                s = teclado.nextLine();
+                raio = Float.parseFloat(s);
+            }
+        }
+        esfera.armazenamento(raio);
+        System.out.println("Area: ");
+        System.out.printf("%.2f", esfera.area());
+        System.out.printf("\n");
+        System.out.println("Volume: ");
+        System.out.printf("%.2f", esfera.volume());
+    }
+}
+
+class Esfera{
+    private float Raio;
+
+    public void armazenamento(float raio){
+        this.Raio = raio;
+    }
+    
+    public double area(){
+        double Area = 4*3.1415*(Raio*Raio);
+        
+        return Area;
+    }
+
+    public double volume(){
+        double Volume = (4/3)*3.1415*(Raio*Raio*Raio);
+
+        return Volume;
+    }
+}

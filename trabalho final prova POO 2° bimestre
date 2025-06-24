@@ -1,0 +1,655 @@
+import java.awt.*;
+import java.io.*;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+
+
+// --- INTERFACE PARA A VIEW ---
+interface ConcessionariaViewInterface {
+    void exibirCarros(List<Carro> carros);
+    void mostrarMensagemErro(String titulo, String mensagem);
+    void mostrarMensagemInfo(String titulo, String mensagem);
+    void limparCamposEntrada();
+    void iniciar();
+}
+
+class Carro implements Serializable {
+    private static final long serialVersionUID = 1L; // Adicionando serialVersionUID para compatibilidade de serialização
+    
+    private final String id;
+    private final String categoria;
+    private final String modelo;
+    private final int ano;
+    private final double preco;
+    private final int qtdePortas;
+    private final String cambio;
+
+    public Carro(String id, String categoria, String modelo, int ano, double preco, int qtdePortas, String cambio) {
+        this.id = id;
+        this.categoria = categoria;
+        this.modelo = modelo;
+        this.ano = ano;
+        this.preco = preco;
+        this.qtdePortas = qtdePortas;
+        this.cambio = cambio;
+    }
+
+
+    public String getId() { 
+        return id; 
+    }
+    public String getCategoria() { 
+        return categoria; 
+    }
+    public String getModelo() { 
+        return modelo; 
+    }
+    public int getAno() { 
+        return ano; 
+    }
+    public double getPreco() { 
+        return preco; 
+    }
+    public int getQtdePortas() { 
+        return qtdePortas; 
+    }
+    public String getCambio() { 
+        return cambio; 
+    }
+
+    DecimalFormat df = new DecimalFormat();
+
+    @Override
+    public String toString() {
+        df.applyPattern("R$ #,##0.00");
+        // Exemplo de formato: Categoria: Sedan, Modelo: Civic, Ano: 2020, Preço: 85000.00
+        return "ID: " + getId() + " - " + "Categoria: " + getCategoria() + " - " + "Modelo: " + getModelo() + " - " + "Ano: " + getAno() + " - " + "Preço: " + df.format(preco) + " - " + "Quantidade de Portas: " + getQtdePortas() + " - " + "Câmbio: " + getCambio();
+    }
+    
+}
+
+// --- MODELO DA APLICAÇÃO ---
+
+
+class ConcessionariaModel {
+    private List<Carro> carros;
+    private static final String ARQUIVO_CARROS = "concessionaria.txt";
+    private static final String ARQUIVO_CONTADOR = "contador_id.txt";
+    private int contadorId;
+
+    public ConcessionariaModel() {
+        carros = new ArrayList<>();
+        carregarCarros();
+        carregarContadorId();
+        salvarCarros();
+        salvarContadorId();
+    }
+
+    private void carregarCarros() {
+        carros = new ArrayList<>();
+        try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO_CARROS))) {
+            String linha;
+            while ((linha = reader.readLine()) != null) {
+                String[] campos = linha.split(";", -1);
+                if (campos.length == 7) {
+                    Carro carro = new Carro(
+                        campos[0],
+                        campos[1],
+                        campos[2],
+                        Integer.parseInt(campos[3]),
+                        Double.parseDouble(campos[4]),
+                        Integer.parseInt(campos[5]),
+                        campos[6]
+                    );
+                    carros.add(carro);
+                }
+            }
+        } catch (Exception e) {
+            carros = new ArrayList<>();
+        }
+    }
+
+    private void salvarCarros() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO_CARROS))) {
+            for (Carro carro : carros) {
+                writer.write(
+                    carro.getId() + ";" +
+                    carro.getCategoria() + ";" +
+                    carro.getModelo() + ";" +
+                    carro.getAno() + ";" +
+                    carro.getPreco() + ";" +
+                    carro.getQtdePortas() + ";" +
+                    carro.getCambio()
+                );
+                writer.newLine();
+            }
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar carros: " + e.getMessage());
+        }
+    }
+
+    private void carregarContadorId() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(ARQUIVO_CONTADOR))) {
+            contadorId = Integer.parseInt(reader.readLine());
+        } catch (Exception e) {
+            contadorId = 1;
+        }
+    }
+
+    private void salvarContadorId() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(ARQUIVO_CONTADOR))) {
+            writer.write(String.valueOf(contadorId));
+        } catch (IOException e) {
+            System.err.println("Erro ao salvar contador de ID: " + e.getMessage());
+        }
+    }
+
+    private String gerarNovoId() {
+        return String.format("C%02d", contadorId++);
+    }
+
+    public boolean adicionarCarro(String categoria, String modelo, int ano, double preco, int qtdePortas, String cambio) {
+        String novoId = gerarNovoId();
+        Carro carro = new Carro(novoId, categoria, modelo, ano, preco, qtdePortas, cambio);
+        boolean adicionado = carros.add(carro);
+        if (adicionado) {
+            salvarCarros();
+            salvarContadorId();
+        }
+        return adicionado;
+    }
+
+    public List<Carro> getTodosCarros() {
+        return new ArrayList<>(carros);
+    }
+
+    public Carro getCarro(int indice) {
+        if (indice >= 0 && indice < carros.size()) 
+            return carros.get(indice);
+            
+        return null;
+    }
+
+    public boolean removerCarro(int indice) {
+        if (indice >= 0 && indice < carros.size()) {
+            carros.remove(indice);
+            salvarCarros();
+            return true;
+        }
+        return false;
+    }
+
+    public List<Carro> buscarCategoria(String categoria) {
+        List<Carro> resultado = new ArrayList<>();
+        for (Carro c : carros) {
+            if (c.getCategoria().equalsIgnoreCase(categoria.trim())) {
+                resultado.add(c);
+            }
+        }
+        return resultado;
+    }
+
+    public boolean editarCarro(int indice, Carro novoCarro) {
+        if (indice >= 0 && indice < carros.size()) {
+            Carro antigo = carros.get(indice);
+            Carro atualizado = new Carro(antigo.getId(), novoCarro.getCategoria(), novoCarro.getModelo(), novoCarro.getAno(),
+                                                novoCarro.getPreco(), novoCarro.getQtdePortas(), novoCarro.getCambio());
+            carros.set(indice, atualizado);
+            salvarCarros();
+            return true;
+        }
+        return false;
+    }
+}
+
+
+// --- CONTROLLER ---
+class ConcessionariaController {
+    private final ConcessionariaModel model;
+    private ConcessionariaViewInterface view;
+
+    public ConcessionariaController(ConcessionariaModel model) {
+        this.model = model;
+    }
+
+    public void setView(ConcessionariaViewInterface view) {
+        this.view = view;
+        atualizarViewComDadosIniciais();
+    }
+
+    private void atualizarViewComDadosIniciais() {
+        if (view != null) {
+            view.exibirCarros(model.getTodosCarros());
+        }
+    }
+
+    public void servicoInserirCarros(String categoria, String modelo, String anoStr, String precoStr, String qtdePortasStr, String cambio) {
+        if (view == null) return;
+
+        if (modelo == null || modelo.trim().isEmpty()) {
+            view.mostrarMensagemErro("Erro de Validação", "O nome não pode estar vazio.");
+            return;
+        }
+
+        int ano;
+        try {
+            ano = Integer.parseInt(anoStr);
+            if (ano <= 0 || ano > 2025) {
+                view.mostrarMensagemErro("Erro de Validação", "O ano deve ser um valor válido.");
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            view.mostrarMensagemErro("Erro de Formato", "Ano inválido.");
+            return;
+        }
+
+        double preco;
+        try {
+            preco = Double.parseDouble(precoStr);
+            if (preco <= 0) {
+                view.mostrarMensagemErro("Erro de Validação", "O preço deve ser positivo.");
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            view.mostrarMensagemErro("Erro de Formato", "Preço inválido.");
+            return;
+        }
+
+        int qtdePortas;
+        try {
+            qtdePortas = Integer.parseInt(qtdePortasStr);
+            if (qtdePortas < 2 || qtdePortas > 4) {
+                view.mostrarMensagemErro("Erro de Validação", "O número de portas deve ser entre 2 e 4.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            view.mostrarMensagemErro("Erro de Formato", "Número de portas inválido.");
+            return;
+        }
+
+        if (cambio == null || cambio.trim().isEmpty()) {
+            view.mostrarMensagemErro("Erro de Validação", "O tipo de câmbio não pode estar vazio.");
+            return;
+        }
+
+        if (model.adicionarCarro(categoria, modelo, ano, preco, qtdePortas, cambio)) {
+            view.exibirCarros(model.getTodosCarros());
+            view.limparCamposEntrada();
+            view.mostrarMensagemInfo("Sucesso", "Carro adicionado com sucesso.");
+        } else {
+            view.mostrarMensagemErro("Erro ao Adicionar", "Não foi possível adicionar o carro.");
+        }
+    }
+
+
+    public void servicoExcluirCarro(int indice) {
+        if (view == null) return;
+
+        Carro carroParaRemover = model.getCarro(indice);
+        if (carroParaRemover == null) {
+             view.mostrarMensagemErro("Erro", "Indice inválido ou carro não encontrada para remoção.");
+             return;
+        }
+
+        if (model.removerCarro(indice)) {
+            view.exibirCarros(model.getTodosCarros());
+            view.mostrarMensagemInfo("Sucesso", "Carro '" + carroParaRemover.getModelo() + "' removida e persistência atualizada.");
+        } else {
+            view.mostrarMensagemErro("Erro ao Remover", "Não foi possível remover/atualizar persistência. Verifique os logs.");
+        }
+    }
+
+    public void servicoBuscarCategoria(String categoria){
+        if(view == null)
+            return;
+        if (categoria == null || categoria.trim().isEmpty()) {
+            view.mostrarMensagemErro("Busca", "Selecione a categoria" );
+            return;
+        }
+        List<Carro> carrosEncontrados = model.buscarCategoria(categoria);
+        if(carrosEncontrados.isEmpty()) {
+            view.mostrarMensagemInfo("Busca", "Nenhum carro encontrado na categoria: " + categoria);
+            return;
+        }
+        view.exibirCarros(carrosEncontrados);
+    }
+
+    public int servicoEditarCarro(int indice,String identificador, String categoria, String modelo, String anoStr, String precoStr, String qtdePortasStr, String cambio) {
+        if(indice < 0 ){
+            view.mostrarMensagemErro("Indice","Índice inválido");
+            return 1;
+        }
+        if(identificador == null || categoria.trim().isEmpty()){
+            view.mostrarMensagemErro(categoria,"Identificador não pode estar vazia");
+            return 1;
+        }
+        if(categoria.trim().isEmpty()){
+            view.mostrarMensagemErro(categoria,"Categoria não pode estar vazia");
+            return 1;
+        }
+        if(modelo == null || modelo.trim().isEmpty()){
+            view.mostrarMensagemErro(modelo,"O modelo não pode estar vazio");
+            return 1;
+        }
+
+        int ano;
+        ano = Integer.parseInt(anoStr);
+        if(ano < 0 || ano > 2025){
+            view.mostrarMensagemErro(anoStr,"Ano inválido! Insira um ano válido!");
+            return 1;
+        }
+
+        double preco;
+        preco = Double.parseDouble(precoStr);
+        if(preco <= 0){
+            view.mostrarMensagemErro(precoStr,"O preço não pode ser menor que zero");
+            return 1;
+        }
+
+        int qtdePortas = Integer.parseInt(qtdePortasStr);
+        if (qtdePortas <= 0 || qtdePortas > 2500) { // Validação básica de altura
+            view.mostrarMensagemErro("Erro de Validação", "A quantidade de portas deve ser um valor positivo e realista (ex: antes de 2500).");
+            return 1;
+        }
+
+        if(cambio == null || modelo.trim().isEmpty()){
+            view.mostrarMensagemErro(modelo,"O câmbio não pode estar vazio");
+            return 1;
+        }
+
+        Carro carroMudar = new Carro(identificador,categoria,modelo,ano,preco,qtdePortas,cambio);
+        if(model.editarCarro(indice, carroMudar)){
+            view.exibirCarros(model.getTodosCarros());
+            view.limparCamposEntrada();
+            view.mostrarMensagemInfo("Sucesso", "Carro editado com sucesso.");
+        }
+
+        return 0;
+    }
+}
+
+
+class ConcessionariaViewSwing extends JFrame implements ConcessionariaViewInterface {
+    private final ConcessionariaController controller;
+    private JTextField campoIdentificador;
+    private JComboBox<String> comboCategoria;
+    private JTextField campoModelo;
+    private JTextField campoAno;
+    private JTextField campoPreco;
+    private JTextField campoPortas;
+
+    private JRadioButton radioManual;
+    private JRadioButton radioAutomatico;
+    private ButtonGroup grupoCambio;
+
+    private JButton botaoLimparCampos;
+    private JButton botaoAdicionar;
+    private JButton botaoRemover;
+    private JButton botaoBuscar;
+    private JButton botaoMostrarTodos;
+    private JButton botaoEditar;
+
+    private JList<Carro> listaCarrosJList;
+    private DefaultListModel<Carro> listModel;
+    
+    private int indiceEditando = -1;
+
+    public ConcessionariaViewSwing(ConcessionariaController controller) {
+        super("Concessionaria MVC Persistente(Swing)");
+        this.controller = controller;
+        configurarUI();
+    }
+
+    private void configurarUI() {
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setSize(750, 500);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout(10, 10));
+        if (getContentPane() instanceof JPanel jPanel) {
+            jPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
+        }
+
+        listModel = new DefaultListModel<>();
+
+        JPanel painelEntrada = new JPanel(new GridBagLayout());
+        painelEntrada.setBorder(BorderFactory.createTitledBorder("Adicionar Novo Carro"));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel labelIdInfo = new JLabel("ID será gerado automaticamente");
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 1;
+        painelEntrada.add(labelIdInfo, gbc);
+
+        campoIdentificador = new JTextField();
+
+        // Linha alterada: trocar JTextField por JComboBox com opções
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        painelEntrada.add(new JLabel("Categoria:"), gbc);
+
+        String[] categorias = {"SUV", "Picape", "Elétrico", "Hatch", "Sedan", "Luxo", "Híbrido", "Conversível", "Esportivo", "Compacto"};
+        comboCategoria = new JComboBox<>(categorias);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        painelEntrada.add(comboCategoria, gbc);
+        gbc.weightx = 0;
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        painelEntrada.add(new JLabel("Modelo:"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        campoModelo = new JTextField(5);
+        painelEntrada.add(campoModelo, gbc);
+        gbc.weightx = 0;
+
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        painelEntrada.add(new JLabel("Ano:"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        campoAno = new JTextField(5);
+        painelEntrada.add(campoAno, gbc);
+        gbc.weightx = 0;
+
+        gbc.gridx = 0;
+        gbc.gridy = 4;
+        painelEntrada.add(new JLabel("Preco:"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        campoPreco = new JTextField(5);
+        painelEntrada.add(campoPreco, gbc);
+        gbc.weightx = 0;
+
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        painelEntrada.add(new JLabel("Quantidade de portas:"), gbc);
+        gbc.gridx = 1;
+        gbc.weightx = 1.0;
+        campoPortas = new JTextField(5);
+        painelEntrada.add(campoPortas, gbc);
+        gbc.weightx = 0;
+
+        gbc.gridx = 0;
+        gbc.gridy = 6;
+        painelEntrada.add(new JLabel("Tipo de câmbio:"), gbc);
+        radioManual = new JRadioButton("Manual");
+        radioAutomatico = new JRadioButton("Automático");
+        grupoCambio = new ButtonGroup();
+        grupoCambio.add(radioManual);
+        grupoCambio.add(radioAutomatico);
+
+        JPanel painelRadios = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        painelRadios.add(radioManual);
+        painelRadios.add(radioAutomatico);
+        gbc.gridx = 1;
+        painelEntrada.add(painelRadios, gbc);
+
+        JPanel botoes = new JPanel();
+        botoes.setLayout(new BoxLayout(botoes, BoxLayout.X_AXIS));
+
+        botaoAdicionar = new JButton("Adicionar Carro");
+        botoes.add(botaoAdicionar);
+
+        botaoBuscar = new JButton("Buscar Categoria");
+        botoes.add(botaoBuscar);
+
+        botaoMostrarTodos = new JButton("Mostrar todos os carros");
+        botoes.add(botaoMostrarTodos);
+
+        botaoEditar = new JButton("Editar Carro");
+        botoes.add(botaoEditar);
+
+        botaoLimparCampos = new JButton("Limpar Campos");
+        botoes.add(botaoLimparCampos);
+
+        gbc.gridx = 0;
+        gbc.gridy = 7;
+        gbc.gridwidth = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        painelEntrada.add(botoes, gbc);
+
+        add(painelEntrada, BorderLayout.NORTH);
+
+        JPanel painelLista = new JPanel(new BorderLayout(0, 5));
+        painelLista.setBorder(BorderFactory.createTitledBorder("Veículos Cadastrados (Persistindo em concessionaria.txt)"));
+        listaCarrosJList = new JList<>(listModel);
+        listaCarrosJList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        painelLista.add(new JScrollPane(listaCarrosJList), BorderLayout.CENTER);
+
+        botaoRemover = new JButton("Remover Selecionado(a)");
+        painelLista.add(botaoRemover, BorderLayout.SOUTH);
+
+        add(painelLista, BorderLayout.CENTER);
+
+        botaoAdicionar.addActionListener(e -> {
+            String categoriaSelecionada = (String) comboCategoria.getSelectedItem();
+            String tipoCambio = radioManual.isSelected() ? "Manual" : "Automático";
+
+            if (indiceEditando == -1) {
+                controller.servicoInserirCarros(
+                        categoriaSelecionada,
+                        campoModelo.getText(),
+                        campoAno.getText(),
+                        campoPreco.getText(),
+                        campoPortas.getText(),
+                        tipoCambio
+                );
+            } else {
+                controller.servicoEditarCarro(
+                        indiceEditando,
+                        campoIdentificador.getText(),
+                        categoriaSelecionada,
+                        campoModelo.getText(),
+                        campoAno.getText(),
+                        campoPreco.getText(),
+                        campoPortas.getText(),
+                        tipoCambio
+                );
+            }
+        });
+
+        botaoRemover.addActionListener(e -> {
+            int indiceSelecionado = listaCarrosJList.getSelectedIndex();
+            if (indiceSelecionado != -1) {
+                controller.servicoExcluirCarro(indiceSelecionado);
+            } else {
+                mostrarMensagemErro("Ação Inválida", "Nenhum carro selecionado para remover.");
+            }
+        });
+
+        botaoBuscar.addActionListener(e -> {
+            String categoriaSelecionada = (String) comboCategoria.getSelectedItem();
+            controller.servicoBuscarCategoria(categoriaSelecionada);
+        });
+
+        botaoMostrarTodos.addActionListener(e -> {
+            controller.setView(this);
+        });
+
+        botaoEditar.addActionListener(e -> {
+            int indiceSelecionado = listaCarrosJList.getSelectedIndex();
+            if (indiceSelecionado != -1) {
+                Carro carro = listModel.get(indiceSelecionado);
+                campoIdentificador.setText(carro.getId());
+                comboCategoria.setSelectedItem(carro.getCategoria()); // aqui setamos o combo
+                campoModelo.setText(carro.getModelo());
+                campoAno.setText(String.valueOf(carro.getAno()));
+                campoPreco.setText(String.valueOf(carro.getPreco()));
+                campoPortas.setText(String.valueOf(carro.getQtdePortas()));
+                if (carro.getCambio().equalsIgnoreCase("Manual")) {
+                    radioManual.setSelected(true);
+                } else {
+                    radioAutomatico.setSelected(true);
+                }
+                indiceEditando = indiceSelecionado;
+                botaoAdicionar.setText("Salvar Edição");
+            } else {
+                mostrarMensagemErro("Ação Inválida", "Nenhum carro selecionado para editar.");
+            }
+        });
+
+        botaoLimparCampos.addActionListener(e -> {
+            limparCamposEntrada();
+        });
+    }
+
+    @Override
+    public void exibirCarros(List<Carro> carros) {
+        listModel.clear();
+        for (Carro c : carros) {
+            listModel.addElement(c);
+        }
+    }
+
+    @Override
+    public void mostrarMensagemErro(String titulo, String mensagem) {
+        JOptionPane.showMessageDialog(this, mensagem, titulo, JOptionPane.ERROR_MESSAGE);
+    }
+
+    @Override
+    public void mostrarMensagemInfo(String titulo, String mensagem) {
+        JOptionPane.showMessageDialog(this, mensagem, titulo, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    @Override
+    public void limparCamposEntrada() {
+        comboCategoria.setSelectedIndex(0);  // volta para "SUV" (primeira opção)
+        campoModelo.setText("");
+        campoAno.setText("");
+        campoPreco.setText("");
+        campoPortas.setText("");
+        grupoCambio.clearSelection();
+        indiceEditando = -1;
+        botaoAdicionar.setText("Adicionar Carro");
+    }
+
+    @Override
+    public void iniciar() {
+        setVisible(true);
+    }
+}
+
+
+
+// --- CLASSE PRINCIPAL (COM NOME AJUSTADO PARA MAINAPP_V04 PARA CONSISTENCIA COM O ARQUIVO DO USUARIO) ---
+public class Carros2 { // Mantendo o nome que você usou para o arquivo
+    public static void main(String[] args) {
+
+        ConcessionariaModel model = new ConcessionariaModel(); // Model agora lida com persistência
+        ConcessionariaController controller = new ConcessionariaController(model);
+    
+        System.out.println("<---Abrindo sistema da concessionária--->");
+        SwingUtilities.invokeLater(() -> {
+            ConcessionariaViewInterface swingView = new ConcessionariaViewSwing(controller);
+            controller.setView(swingView);
+            swingView.iniciar();
+        });
+    }
+}

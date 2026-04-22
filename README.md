@@ -2,6 +2,14 @@
   <head></head>
   <body>
     <h1>Fullstack Developer</h1>
+    <th>Stack</th>
+    <tr>Node JS</tr>
+    <tr>Typescript</tr>
+    <th>Bancos de dados</th>
+    <tr>MySQL</tr>
+    <tr>MongoDB</tr>
+    <tr>PostgreSQL</tr>
+    <tr>Neo4J</tr>
   </body>
 </html>
 

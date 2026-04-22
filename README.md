@@ -7,21 +7,11 @@
     <th>Bancos de dados</th>
       <tr>
         <td>Node JS</td>
-      </tr>
-      <tr>
-        <td>Typescript</td>
-      </tr>
-    <th>Bancos de dados</th>
-      <tr>
         <td>MySQL</td>
       </tr>
       <tr>
+        <td>Typescript</td>
         <td>MongoDB</td>
-      </tr>
-      <tr>
-        <td>PostgreSQL</td>
-      <tr>
-        <td>Neo4J</td>
       </tr>
     </table>
   </body>

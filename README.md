@@ -85,8 +85,7 @@
 <div align="center">
   <p>📬 <b>Conecte-se comigo</b></p>
   <p>
-    <a href="mailto:seu-email@email.com"><code>Email</code></a> •
-    <a href="https://linkedin.com/in/seu-perfil" target="_blank"><code>LinkedIn</code></a> •
-    <a href="https://seu-portfolio.com" target="_blank"><code>Portfólio</code></a>
+    <a href="mailto:michel.aguiar.cardoso11@gmail.com"><code>Email</code></a> •
+    <a href="https://www.linkedin.com/in/michel-aguiar-cardoso-51443b303/" target="_blank"><code>LinkedIn</code></a> •
   </p>
 </div>

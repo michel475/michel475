@@ -47,7 +47,7 @@
 
 <br />
 
-<h3> Data Science, NLP & Automação</h3>
+<h3>⚙ Data Science, NLP & Automação</h3>
 
 <table width="100%">
   <tr>
